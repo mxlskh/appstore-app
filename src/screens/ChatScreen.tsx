@@ -1,120 +1,125 @@
 // src/screens/ChatScreen.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
-  FlatList,
   TextInput,
   TouchableOpacity,
-  Image,
   StyleSheet,
-  Platform,
-  KeyboardAvoidingView
+  FlatList
 } from 'react-native';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
 
-interface Message {
-  id: string;
-  userId: number;
-  text?: string;
-  imageUri?: string;
-  createdAt: Date;
-}
+type Message = { id: string; fromUser: boolean; text: string };
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const flatRef = useRef<FlatList>(null);
 
-  const sendText = useCallback(() => {
+  const send = () => {
     if (!input.trim()) return;
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      userId: 1,
-      text: input.trim(),
-      createdAt: new Date()
-    };
-    setMessages(prev => [newMsg, ...prev]);
+    setMessages(prev => [
+      ...prev,
+      { id: Date.now().toString(), fromUser: true, text: input }
+    ]);
     setInput('');
-  }, [input]);
-
-  const renderItem = ({ item }: { item: Message }) => {
-    const isMe = item.userId === 1;
-    return (
-      <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleBot]}>
-        {item.text && <Text style={styles.text}>{item.text}</Text>}
-        {item.imageUri && <Image source={{ uri: item.imageUri }} style={styles.image} />}
-        <Text style={styles.time}>{item.createdAt.toLocaleTimeString()}</Text>
-      </View>
-    );
+    // Здесь ваш вызов API и добавление ответа ассистента
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={60}
-    >
-      {/* FlatList — единственный скролл */}
+    <SafeAreaView style={styles.container}>
       <FlatList
+        ref={flatRef}
         data={messages}
-        inverted
-        keyExtractor={msg => msg.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.list}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <View
+            style={[
+              styles.bubble,
+              item.fromUser ? styles.userBubble : styles.assistantBubble
+            ]}
+          >
+            <Text
+              style={[
+                styles.bubbleText,
+                { color: item.fromUser ? '#fff' : Colors.text }
+              ]}
+            >
+              {item.text}
+            </Text>
+          </View>
+        )}
+        contentContainerStyle={{ padding: Spacing.md }}
+        onContentSizeChange={() => flatRef.current?.scrollToEnd()}
       />
-
-      {/* Строка ввода */}
       <View style={styles.inputRow}>
         <TextInput
           style={styles.input}
+          placeholder="Напишите сообщение..."
+          placeholderTextColor={Colors.muted}
           value={input}
           onChangeText={setInput}
-          placeholder="Введите сообщение..."
         />
-        <TouchableOpacity style={styles.sendBtn} onPress={sendText}>
-          <Text style={styles.sendTxt}>Отправить</Text>
+        <TouchableOpacity style={styles.sendButton} onPress={send}>
+          <Text style={styles.sendText}>→</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f2f5f9' },
-  list: { padding: 8 },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background
+  },
   bubble: {
-    marginVertical: 4,
-    marginHorizontal: 12,
-    padding: 10,
-    borderRadius: 12,
-    maxWidth: '80%'
+    maxWidth: '80%',
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.md,
+    marginVertical: Spacing.xs
   },
-  bubbleMe: {
-    backgroundColor: '#3478f6',
-    alignSelf: 'flex-end'
+  userBubble: {
+    backgroundColor: Colors.primary,
+    alignSelf: 'flex-end',
+    borderBottomRightRadius: 0
   },
-  bubbleBot: {
-    backgroundColor: '#fff',
-    alignSelf: 'flex-start'
+  assistantBubble: {
+    backgroundColor: Colors.card,
+    alignSelf: 'flex-start',
+    borderBottomLeftRadius: 0,
+    borderWidth: 1,
+    borderColor: Colors.border
   },
-  text: { color: '#000' },
-  time: { fontSize: 10, color: '#666', alignSelf: 'flex-end', marginTop: 4 },
-  image: { width: 150, height: 100, borderRadius: 8, marginTop: 8 },
+  bubbleText: {
+    fontSize: FontSizes.md
+  },
   inputRow: {
     flexDirection: 'row',
-    padding: 8,
+    padding: Spacing.sm,
     borderTopWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff'
+    borderColor: Colors.border,
+    backgroundColor: Colors.card
   },
   input: {
     flex: 1,
-    height: 40,
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 20,
-    backgroundColor: '#fafafa'
+    backgroundColor: Colors.background,
+    borderRadius: BorderRadius.lg,
+    paddingHorizontal: Spacing.md,
+    fontSize: FontSizes.md,
+    marginRight: Spacing.sm
   },
-  sendBtn: { justifyContent: 'center', paddingHorizontal: 12 },
-  sendTxt: { color: '#3478f6', fontWeight: '600' }
+  sendButton: {
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.sm,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  sendText: {
+    color: '#fff',
+    fontSize: FontSizes.lg
+  }
 });

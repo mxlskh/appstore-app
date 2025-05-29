@@ -9,50 +9,49 @@ import {
   StyleSheet,
   ScrollView
 } from 'react-native';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
 
 type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
-export default function SettingsScreen({ route, navigation }: SettingsProps) {
+export default function SettingsScreen({ navigation, route }: SettingsProps) {
   const { role } = route.params;
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(false);
+  const [notifications, setNotifications] = useState(false);
+  const [dark, setDark] = useState(false);
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Переключатель уведомлений */}
         <View style={styles.row}>
           <Text style={styles.label}>Уведомления</Text>
-          <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} />
+          <Switch
+            value={notifications}
+            onValueChange={setNotifications}
+            trackColor={{ true: Colors.primary }}
+          />
         </View>
-        {/* Переключатель темы */}
         <View style={styles.row}>
           <Text style={styles.label}>Тёмная тема</Text>
-          <Switch value={darkTheme} onValueChange={setDarkTheme} />
+          <Switch
+            value={dark}
+            onValueChange={setDark}
+            trackColor={{ true: Colors.primary }}
+          />
         </View>
-        {/* Кнопка изменить роль */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.replace('RoleSelection')}
         >
           <Text style={styles.buttonText}>Изменить роль</Text>
         </TouchableOpacity>
-        {/* Кнопка изменить язык */}
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.replace('LanguageSelection', { role })}
         >
           <Text style={styles.buttonText}>Изменить язык</Text>
         </TouchableOpacity>
-        {/* Кнопка «О разработчиках» */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            /* сюда можно добавить navigation.navigate('About') */
-          }}
-        >
+        <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>О разработчиках</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -61,20 +60,33 @@ export default function SettingsScreen({ route, navigation }: SettingsProps) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  content: { padding: 24 },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background
+  },
+  content: {
+    padding: Spacing.md
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24
+    marginVertical: Spacing.sm
   },
-  label: { fontSize: 18 },
+  label: {
+    fontSize: FontSizes.md,
+    color: Colors.text
+  },
   button: {
-    backgroundColor: '#f2f5f9',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16
+    backgroundColor: Colors.card,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginVertical: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.border
   },
-  buttonText: { fontSize: 16 }
+  buttonText: {
+    fontSize: FontSizes.md,
+    color: Colors.text
+  }
 });

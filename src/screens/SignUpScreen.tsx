@@ -1,122 +1,92 @@
 // src/screens/SignUpScreen.tsx
 import React, { useState } from 'react';
 import {
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  View,
+  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert
+  StyleSheet
 } from 'react-native';
-import { auth } from '../../supabase';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../App';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
 
-export default function SignUpScreen({ navigation }: { navigation: any }) {
+type SignUpProps = NativeStackScreenProps<RootStackParamList, 'SignUp'>;
+
+export default function SignUpScreen({ navigation }: SignUpProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const signUp = async () => {
-    const { error } = await auth.signUp({ email, password });
-    if (error) return Alert.alert('Ошибка', error.message);
-    Alert.alert('Готово', 'Проверьте почту для подтверждения');
-    navigation.replace('GetStarted');
-  };
-
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <View style={styles.box}>
-        <Text style={styles.title}>Регистрация</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#888"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          onChangeText={setEmail}
-          value={email}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Пароль"
-          placeholderTextColor="#888"
-          secureTextEntry
-          onChangeText={setPassword}
-          value={password}
-        />
-        <TouchableOpacity style={styles.button} onPress={signUp}>
-          <Text style={styles.buttonText}>Зарегистрироваться</Text>
-        </TouchableOpacity>
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Уже есть аккаунт?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-            <Text style={styles.footerLink}> Войти</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Новая учётная запись</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        placeholderTextColor={Colors.muted}
+        value={email}
+        onChangeText={setEmail}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Пароль"
+        placeholderTextColor={Colors.muted}
+        secureTextEntry
+        value={password}
+        onChangeText={setPassword}
+      />
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.replace('GetStarted')}
+      >
+        <Text style={styles.buttonText}>Зарегистрироваться</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Text style={styles.link}>Уже есть аккаунт? Войти</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
-const PRIMARY = '#3478f6';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f5f9',
-    justifyContent: 'center',
-    paddingHorizontal: 24
-  },
-  box: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3
+    backgroundColor: Colors.background,
+    padding: Spacing.md,
+    justifyContent: 'center'
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
-    marginBottom: 24,
-    textAlign: 'center',
-    color: '#333'
+    fontSize: FontSizes.xl,
+    fontWeight: '700',
+    color: Colors.primary,
+    marginBottom: Spacing.lg,
+    alignSelf: 'center'
   },
   input: {
-    height: 48,
-    borderColor: '#ddd',
+    backgroundColor: Colors.card,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    backgroundColor: '#fafafa'
+    borderColor: Colors.border,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.sm,
+    marginBottom: Spacing.md,
+    fontSize: FontSizes.md,
+    color: Colors.text
   },
   button: {
-    backgroundColor: PRIMARY,
-    borderRadius: 8,
-    height: 48,
-    justifyContent: 'center',
+    backgroundColor: Colors.accent,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
     alignItems: 'center',
-    marginTop: 8
+    marginBottom: Spacing.sm
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '500'
+    fontSize: FontSizes.md,
+    fontWeight: '600'
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 16
-  },
-  footerText: {
-    color: '#666'
-  },
-  footerLink: {
-    color: PRIMARY,
-    fontWeight: '500'
+  link: {
+    color: Colors.primary,
+    fontSize: FontSizes.sm,
+    textAlign: 'center'
   }
 });

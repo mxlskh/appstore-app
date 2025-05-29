@@ -2,10 +2,7 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps
-} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 import SignInScreen from './src/screens/SignInScreen';
@@ -15,6 +12,8 @@ import RoleSelectionScreen from './src/screens/RoleSelectionScreen';
 import LanguageSelectionScreen from './src/screens/LanguageSelectionScreen';
 import ChatScreen from './src/screens/ChatScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+
+import { Colors } from './src/theme';
 
 export type RootStackParamList = {
   SignIn: undefined;
@@ -37,26 +36,31 @@ export default function App() {
           component={SignInScreen}
           options={{ title: 'Войти' }}
         />
+
         <Stack.Screen
           name="SignUp"
           component={SignUpScreen}
           options={{ title: 'Регистрация' }}
         />
+
         <Stack.Screen
           name="GetStarted"
           component={GetStartedScreen}
           options={{ headerShown: false }}
         />
+
         <Stack.Screen
           name="RoleSelection"
           component={RoleSelectionScreen}
           options={{ headerShown: false }}
         />
+
         <Stack.Screen
           name="LanguageSelection"
           component={LanguageSelectionScreen}
           options={{ headerShown: false, title: 'Выберите язык' }}
         />
+
         <Stack.Screen
           name="Chat"
           component={ChatScreen}
@@ -74,11 +78,12 @@ export default function App() {
                 }
                 style={{ marginRight: 16 }}
               >
-                <Ionicons name="settings-outline" size={24} color="#333" />
+                <Ionicons name="settings-outline" size={24} color={Colors.text} />
               </TouchableOpacity>
             )
           })}
         />
+
         <Stack.Screen
           name="Settings"
           component={SettingsScreen}

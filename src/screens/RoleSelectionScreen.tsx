@@ -1,127 +1,75 @@
 // src/screens/RoleSelectionScreen.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TouchableOpacity,
-  StyleSheet,
-  Modal,
-  ScrollView
+  StyleSheet
 } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../App';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
 
-export default function RoleSelectionScreen({ navigation }: { navigation: any }) {
-  const [modalVisible, setModalVisible] = useState(false);
-  const rolesInfo = `
-👨‍🎓 Ученик:
-  можешь изучать язык через тесты, задания, голосовые и текстовые упражнения,
-  получая мгновенную обратную связь.
+type RoleSelectionProps = NativeStackScreenProps<RootStackParamList, 'RoleSelection'>;
 
-👩‍🏫 Преподаватель:
-  можешь создавать задания, проверять ответы учеников и
-  использовать бота как ассистента для планирования и обучения.
-`;
+export default function RoleSelectionScreen({ navigation }: RoleSelectionProps) {
+  const onChoose = (role: 'student' | 'teacher') =>
+    navigation.replace('LanguageSelection', { role });
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Кто вы?</Text>
-      <TouchableOpacity
-        style={styles.roleButton}
-        onPress={() => navigation.navigate('LanguageSelection', { role: 'student' })}
-      >
-        <Text style={styles.roleText}>👨‍🎓 Ученик</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.roleButton}
-        onPress={() => navigation.navigate('LanguageSelection', { role: 'teacher' })}
-      >
-        <Text style={styles.roleText}>👩‍🏫 Преподаватель</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.aboutLink} onPress={() => setModalVisible(true)}>
-        <Text style={styles.aboutText}>О ролях</Text>
-      </TouchableOpacity>
-
-      <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView>
-              <Text style={styles.modalTitle}>Описание ролей</Text>
-              <Text style={styles.modalBody}>{rolesInfo}</Text>
-            </ScrollView>
-            <TouchableOpacity style={styles.modalClose} onPress={() => setModalVisible(false)}>
-              <Text style={styles.modalCloseText}>Закрыть</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <View style={styles.buttons}>
+        <TouchableOpacity
+          style={[styles.card, { backgroundColor: Colors.accent }]}
+          onPress={() => onChoose('teacher')}
+        >
+          <Text style={styles.cardText}>Преподаватель</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.card, { backgroundColor: Colors.primary }]}
+          onPress={() => onChoose('student')}
+        >
+          <Text style={styles.cardText}>Ученик</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
 
-const PRIMARY = '#3478f6';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
+    padding: Spacing.md,
     justifyContent: 'center'
   },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: FontSizes.xl,
+    fontWeight: '700',
+    color: Colors.text,
     textAlign: 'center',
-    marginBottom: 24
+    marginBottom: Spacing.lg
   },
-  roleButton: {
-    backgroundColor: '#f2f5f9',
-    borderRadius: 8,
-    paddingVertical: 16,
-    marginBottom: 16,
-    alignItems: 'center'
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around'
   },
-  roleText: {
-    fontSize: 20,
-    color: '#333'
+  card: {
+    width: '40%',
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    shadowColor: Colors.text,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4
   },
-  aboutLink: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24
-  },
-  aboutText: {
-    color: PRIMARY,
-    fontSize: 16
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    padding: 24
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    maxHeight: '80%',
-    padding: 16
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: '600',
-    marginBottom: 12,
-    textAlign: 'center'
-  },
-  modalBody: {
-    fontSize: 16,
-    color: '#444',
-    lineHeight: 22
-  },
-  modalClose: {
-    marginTop: 16,
-    alignSelf: 'center'
-  },
-  modalCloseText: {
-    color: PRIMARY,
-    fontWeight: '500'
+  cardText: {
+    color: '#fff',
+    fontSize: FontSizes.md,
+    fontWeight: '600'
   }
 });

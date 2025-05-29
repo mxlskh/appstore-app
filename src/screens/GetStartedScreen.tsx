@@ -1,54 +1,56 @@
 // src/screens/GetStartedScreen.tsx
 import React from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  StyleSheet
+} from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../App';
+import { Colors, Spacing, FontSizes, BorderRadius } from '../theme';
 
-export default function GetStartedScreen({ navigation }: { navigation: any }) {
+type GetStartedProps = NativeStackScreenProps<RootStackParamList, 'GetStarted'>;
+
+export default function GetStartedScreen({ navigation }: GetStartedProps) {
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Чат с ИИ</Text>
-      <Text style={styles.subtitle}>
-        Добро пожаловать! Здесь вы можете учиться или преподавать с помощью нашего бота.
-      </Text>
+      <Text style={styles.title}>Начнём наше путешествие в мир языков!</Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('RoleSelection')}
+        onPress={() => navigation.replace('RoleSelection')}
       >
-        <Text style={styles.buttonText}>Давай начнём</Text>
+        <Text style={styles.buttonText}>Давай по порядку</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
-const PRIMARY = '#3478f6';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f2f5f9',
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24
+    padding: Spacing.md
   },
   title: {
-    fontSize: 32,
+    color: '#fff',
+    fontSize: FontSizes.lg,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 16
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
     textAlign: 'center',
-    marginBottom: 32
+    marginBottom: Spacing.xl
   },
   button: {
-    backgroundColor: PRIMARY,
-    borderRadius: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 32
+    backgroundColor: '#fff',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    width: '80%',
+    alignItems: 'center'
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '500'
+    color: Colors.primary,
+    fontSize: FontSizes.md,
+    fontWeight: '600'
   }
 });

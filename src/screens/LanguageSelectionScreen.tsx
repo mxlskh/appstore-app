@@ -5,50 +5,77 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView
+  FlatList
 } from 'react-native';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../../App';
+import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
+
+const LANGUAGES = [
+  { code: 'en', label: 'Английский' },
+  { code: 'de', label: 'Немецкий' },
+  { code: 'fr', label: 'Французский' },
+  { code: 'zh', label: 'Китайский' },
+  { code: 'es', label: 'Испанский' }
+];
+
+type Props = NativeStackScreenProps<RootStackParamList, 'LanguageSelection'>;
 
 export default function LanguageSelectionScreen({
   route,
   navigation
-}: { route: { params: { role: 'student' | 'teacher' } }; navigation: any }) {
+}: Props) {
   const { role } = route.params;
-
-  const languages = [
-    { code: 'en', label: '🇺🇸/🇬🇧 Английский' },
-    { code: 'es', label: '🇪🇸 Испанский' },
-    { code: 'zh', label: '🇨🇳 Китайский' },
-    { code: 'fr', label: '🇫🇷 Французский' },
-    { code: 'ar', label: '🇦🇪 Арабский' },
-    { code: 'ru', label: '🇷🇺 Русский' },
-    { code: 'de', label: '🇩🇪 Немецкий' },
-    { code: 'pt', label: '🇵🇹 Португальский' },
-    { code: 'ja', label: '🇯🇵 Японский' },
-    { code: 'it', label: '🇮🇹 Итальянский' }
-  ];
-
-  const selectLanguage = (langCode: string) => {
-    navigation.navigate('Chat', { role, language: langCode });
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Выберите язык</Text>
-      <ScrollView contentContainerStyle={styles.list}>
-        {languages.map(lang => (
-          <TouchableOpacity key={lang.code} style={styles.item} onPress={() => selectLanguage(lang.code)}>
-            <Text style={styles.itemText}>{lang.label}</Text>
+      <FlatList
+        data={LANGUAGES}
+        keyExtractor={item => item.code}
+        numColumns={2}
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() =>
+              navigation.replace('Chat', { role, language: item.code })
+            }
+          >
+            <Text style={styles.cardText}>{item.label}</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+        )}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        contentContainerStyle={{ paddingBottom: Spacing.lg }}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, backgroundColor: '#fff' },
-  title: { fontSize: 28, fontWeight: '600', marginBottom: 16, textAlign: 'center' },
-  list: { paddingVertical: 8 },
-  item: { paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: '#eee' },
-  itemText: { fontSize: 18 }
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+    padding: Spacing.md
+  },
+  title: {
+    fontSize: FontSizes.xl,
+    fontWeight: '700',
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: Spacing.lg
+  },
+  card: {
+    backgroundColor: Colors.card,
+    width: '48%',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.sm,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Colors.border
+  },
+  cardText: {
+    fontSize: FontSizes.md,
+    color: Colors.text,
+    fontWeight: '500'
+  }
 });

@@ -28,7 +28,7 @@ export default function LanguageSelectionScreen({
   ];
 
   const selectLanguage = (langCode: string) => {
-    navigation.replace('Chat', { role, language: langCode });
+    navigation.navigate('Chat', { role, language: langCode });
   };
 
   return (

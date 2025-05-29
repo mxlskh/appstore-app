@@ -11,7 +11,7 @@ export default function GetStartedScreen({ navigation }: { navigation: any }) {
       </Text>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.replace('RoleSelection')}
+        onPress={() => navigation.navigate('RoleSelection')}
       >
         <Text style={styles.buttonText}>Давай начнём</Text>
       </TouchableOpacity>

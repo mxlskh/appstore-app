@@ -1,127 +1,51 @@
 // src/screens/ChatScreen.tsx
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Image,
   StyleSheet,
   Platform,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Text
+  KeyboardAvoidingView
 } from 'react-native';
-import {
-  GiftedChat,
-  InputToolbar,
-  IMessage,
-  User
-} from 'react-native-gifted-chat';
-import * as ImagePicker from 'expo-image-picker';
-import * as DocumentPicker from 'expo-document-picker';
-import { Audio } from 'expo-av';
 
-export default function ChatScreen({
-  route,
-  navigation
-}: {
-  route: { params: { role: 'student' | 'teacher'; language: string } };
-  navigation: any;
-}) {
-  const { role, language } = route.params;
-  const [messages, setMessages] = useState<IMessage[]>([]);
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
-  const [sending, setSending] = useState(false);
+interface Message {
+  id: string;
+  userId: number;
+  text?: string;
+  imageUri?: string;
+  createdAt: Date;
+}
 
-  useEffect(() => {
-    const welcomeText =
-      role === 'teacher'
-        ? '👩‍🏫 Привет, преподаватель! Готовы создавать задания?'
-        : '👨‍🎓 Привет, ученик! Я помогу с практикой.';
-    setMessages([
-      {
-        _id: 1,
-        text: welcomeText,
-        createdAt: new Date(),
-        user: { _id: 2, name: 'ИИ' } as User
-      }
-    ]);
-  }, [role]);
+export default function ChatScreen() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
 
-  const onSend = useCallback((newMessages: IMessage[] = []) => {
-    setMessages(prev => GiftedChat.append(prev, newMessages));
-    // TODO: отправить вместе с { role, language }
-  }, []);
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 0.7
-    });
-    if ((result as any).canceled) return;
-    const asset = (result as any).assets?.[0];
-    if (!asset) return;
-    const msg: IMessage = {
-      _id: Date.now(),
-      text: '',
-      createdAt: new Date(),
-      user: { _id: 1 } as User,
-      image: asset.uri
+  const sendText = useCallback(() => {
+    if (!input.trim()) return;
+    const newMsg: Message = {
+      id: Date.now().toString(),
+      userId: 1,
+      text: input.trim(),
+      createdAt: new Date()
     };
-    setMessages(prev => GiftedChat.append(prev, [msg]));
-  };
+    setMessages(prev => [newMsg, ...prev]);
+    setInput('');
+  }, [input]);
 
-  const pickDocument = async () => {
-    const res: any = await DocumentPicker.getDocumentAsync({});
-    if (res.type === 'cancel') return;
-    const msg: IMessage = {
-      _id: Date.now(),
-      text: `📎 ${res.name}`,
-      createdAt: new Date(),
-      user: { _id: 1 } as User
-    };
-    setMessages(prev => GiftedChat.append(prev, [msg]));
+  const renderItem = ({ item }: { item: Message }) => {
+    const isMe = item.userId === 1;
+    return (
+      <View style={[styles.bubble, isMe ? styles.bubbleMe : styles.bubbleBot]}>
+        {item.text && <Text style={styles.text}>{item.text}</Text>}
+        {item.imageUri && <Image source={{ uri: item.imageUri }} style={styles.image} />}
+        <Text style={styles.time}>{item.createdAt.toLocaleTimeString()}</Text>
+      </View>
+    );
   };
-
-  const startRecording = async () => {
-    const { status } = await Audio.requestPermissionsAsync();
-    if (status !== 'granted') return;
-    const rec = new Audio.Recording();
-    await rec.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-    await rec.startAsync();
-    setRecording(rec);
-  };
-  const stopRecording = async () => {
-    if (!recording) return;
-    await recording.stopAndUnloadAsync();
-    const uri = recording.getURI();
-    setRecording(null);
-    if (!uri) return;
-    const msg: IMessage = {
-      _id: Date.now(),
-      text: '',
-      createdAt: new Date(),
-      user: { _id: 1 } as User,
-      audio: uri
-    };
-    setMessages(prev => GiftedChat.append(prev, [msg]));
-  };
-
-  const renderActions = () => (
-    <View style={styles.actions}>
-      <Text onPress={pickImage} style={styles.action}>📷</Text>
-      <Text onPress={pickDocument} style={styles.action}>📎</Text>
-      {recording ? (
-        <Text onPress={stopRecording} style={styles.action}>⏹️</Text>
-      ) : (
-        <Text onPress={startRecording} style={styles.action}>🎙️</Text>
-      )}
-    </View>
-  );
-
-  const renderInputToolbar = (props: any) => (
-    <View>
-      {sending && <ActivityIndicator style={{ margin: 8 }} />}
-      <InputToolbar {...props} />
-    </View>
-  );
 
   return (
     <KeyboardAvoidingView
@@ -129,27 +53,68 @@ export default function ChatScreen({
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={60}
     >
-      <GiftedChat
-        messages={messages}
-        onSend={onSend}
-        user={{ _id: 1 }}
-        renderActions={renderActions}
-        renderInputToolbar={renderInputToolbar}
+      {/* FlatList — единственный скролл */}
+      <FlatList
+        data={messages}
+        inverted
+        keyExtractor={msg => msg.id}
+        renderItem={renderItem}
+        contentContainerStyle={styles.list}
       />
+
+      {/* Строка ввода */}
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          value={input}
+          onChangeText={setInput}
+          placeholder="Введите сообщение..."
+        />
+        <TouchableOpacity style={styles.sendBtn} onPress={sendText}>
+          <Text style={styles.sendTxt}>Отправить</Text>
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 8,
-    marginBottom: 4
+  container: { flex: 1, backgroundColor: '#f2f5f9' },
+  list: { padding: 8 },
+  bubble: {
+    marginVertical: 4,
+    marginHorizontal: 12,
+    padding: 10,
+    borderRadius: 12,
+    maxWidth: '80%'
   },
-  action: {
-    fontSize: 24,
-    marginRight: 16
-  }
+  bubbleMe: {
+    backgroundColor: '#3478f6',
+    alignSelf: 'flex-end'
+  },
+  bubbleBot: {
+    backgroundColor: '#fff',
+    alignSelf: 'flex-start'
+  },
+  text: { color: '#000' },
+  time: { fontSize: 10, color: '#666', alignSelf: 'flex-end', marginTop: 4 },
+  image: { width: 150, height: 100, borderRadius: 8, marginTop: 8 },
+  inputRow: {
+    flexDirection: 'row',
+    padding: 8,
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff'
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 20,
+    backgroundColor: '#fafafa'
+  },
+  sendBtn: { justifyContent: 'center', paddingHorizontal: 12 },
+  sendTxt: { color: '#3478f6', fontWeight: '600' }
 });

@@ -7,21 +7,27 @@ import {
   Switch,
   TouchableOpacity,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  Platform
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { useAppTheme } from '../../App';                  // ← правильный хук
+import { useAppTheme } from '../../App';
 import { Spacing, BorderRadius, FontSizes } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
 export default function SettingsScreen({ navigation, route }: Props) {
-  const { isDark, toggleTheme, colors } = useAppTheme();  // ← берём colors из контекста
+  const { isDark, toggleTheme, colors } = useAppTheme();
   const { role } = route.params;
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Логотип / название приложения */}
+      <Text style={[styles.logo, { color: colors.primary }]}>Lingro</Text>
+      {/* Заголовок экрана */}
+      <Text style={[styles.screenTitle, { color: colors.text }]}>Настройки</Text>
+
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.row}>
           <Text style={[styles.label, { color: colors.text }]}>Тёмная тема</Text>
@@ -37,24 +43,18 @@ export default function SettingsScreen({ navigation, route }: Props) {
           style={[styles.button, { borderColor: colors.border }]}
           onPress={() => navigation.replace('RoleSelection')}
         >
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            Изменить роль
-          </Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>Изменить роль</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, { borderColor: colors.border }]}
           onPress={() => navigation.replace('LanguageSelection', { role })}
         >
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            Изменить язык
-          </Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>Изменить язык</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={[styles.button, { borderColor: colors.border }]}>
-          <Text style={[styles.buttonText, { color: colors.text }]}>
-            О разработчиках
-          </Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>О разработчиках</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -64,6 +64,22 @@ export default function SettingsScreen({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  logo: {
+    fontSize: FontSizes.xl * 1.5,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginVertical: Spacing.md,
+    ...Platform.select({
+      ios:   { fontFamily: 'AvenirNext-Heavy' },
+      android: { fontFamily: 'sans-serif-black' }
+    })
+  },
+  screenTitle: {
+    fontSize: FontSizes.lg,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: Spacing.lg
   },
   content: {
     padding: Spacing.md

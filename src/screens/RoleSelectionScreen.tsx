@@ -5,27 +5,31 @@ import {
   View,
   Text,
   TouchableOpacity,
-  StyleSheet
+  StyleSheet,
+  Platform
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { useAppTheme } from '../../App';          // ← импортируем ваш хук
+import { useAppTheme } from '../../App';
 import { Spacing, BorderRadius, FontSizes } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'RoleSelection'>;
 
 export default function RoleSelectionScreen({ navigation }: Props) {
-  const { colors } = useAppTheme();              // ← получаем свои цвета
+  const { colors } = useAppTheme();
 
   const onChoose = (role: 'student' | 'teacher') =>
     navigation.replace('LanguageSelection', { role });
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.logo, { color: colors.primary }]}>
+        Lingro
+      </Text>
       <Text style={[styles.title, { color: colors.text }]}>Кто вы?</Text>
       <View style={styles.buttons}>
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: colors.accent }]}  // ← теперь работает
+          style={[styles.card, { backgroundColor: colors.accent }]}
           onPress={() => onChoose('teacher')}
         >
           <Text style={[styles.cardText, { color: '#fff' }]}>Преподаватель</Text>
@@ -46,6 +50,16 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: Spacing.md,
     justifyContent: 'center'
+  },
+  logo: {
+    fontSize: FontSizes.xl * 1.5,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+    ...Platform.select({
+      ios:   { fontFamily: 'AvenirNext-Heavy' },
+      android: { fontFamily: 'sans-serif-black' }
+    })
   },
   title: {
     fontSize: FontSizes.xl,

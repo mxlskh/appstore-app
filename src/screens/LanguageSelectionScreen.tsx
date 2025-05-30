@@ -5,11 +5,12 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  FlatList
+  FlatList,
+  Platform
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useTheme } from '@react-navigation/native';
 import type { RootStackParamList } from '../../App';
+import { useAppTheme } from '../../App';
 import { Spacing, BorderRadius, FontSizes } from '../theme';
 
 const LANGUAGES = [
@@ -31,16 +32,16 @@ export default function LanguageSelectionScreen({
   route,
   navigation
 }: Props) {
-  const { colors } = useTheme();
+  const { colors } = useAppTheme();
   const { role } = route.params;
 
   return (
-    <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background }]}
-    >
-      <Text style={[styles.title, { color: colors.text }]}>
-        Выберите язык
-      </Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Заголовок приложения */}
+      <Text style={[styles.logo, { color: colors.primary }]}>Lingro</Text>
+      {/* Заголовок экрана */}
+      <Text style={[styles.title, { color: colors.text }]}>Выберите язык</Text>
+
       <FlatList
         data={LANGUAGES}
         keyExtractor={item => item.code}
@@ -49,10 +50,7 @@ export default function LanguageSelectionScreen({
           <TouchableOpacity
             style={[
               styles.card,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border
-              }
+              { backgroundColor: colors.card, borderColor: colors.border }
             ]}
             onPress={() =>
               navigation.replace('Chat', { role, language: item.code })
@@ -74,6 +72,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: Spacing.md
+  },
+  logo: {
+    fontSize: FontSizes.xl * 1.5,
+    fontWeight: '800',
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+    ...Platform.select({
+      ios: { fontFamily: 'AvenirNext-Heavy' },
+      android: { fontFamily: 'sans-serif-black' }
+    })
   },
   title: {
     fontSize: FontSizes.xl,

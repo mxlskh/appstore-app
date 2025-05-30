@@ -36,9 +36,12 @@ export default function ChatScreen() {
     <KeyboardAvoidingView
       style={[styles.flex, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        {/* Название приложения */}
+        <Text style={[styles.logo, { color: colors.primary }]}>Lingro</Text>
+
         <FlatList
           ref={flatRef}
           data={messages}
@@ -91,7 +94,7 @@ export default function ChatScreen() {
               }
             ]}
             placeholder="Напишите сообщение..."
-            placeholderTextColor={colors.muted!}
+            placeholderTextColor={colors.muted}
             value={input}
             onChangeText={setInput}
           />
@@ -113,6 +116,16 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1
+  },
+  logo: {
+    fontSize: FontSizes.xl * 1.5,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginVertical: Spacing.md,
+    ...Platform.select({
+      ios: { fontFamily: 'AvenirNext-Heavy' },
+      android: { fontFamily: 'sans-serif-black' }
+    })
   },
   messageList: {
     flex: 1

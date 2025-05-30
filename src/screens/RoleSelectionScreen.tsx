@@ -1,10 +1,9 @@
-// src/screens/RoleSelectionScreen.tsx
 import React from 'react';
 import {
   SafeAreaView,
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Platform
 } from 'react-native';
@@ -23,34 +22,39 @@ export default function RoleSelectionScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.logo, { color: colors.primary }]}>
-        Lingro
-      </Text>
+      <Text style={[styles.logo, { color: colors.primary }]}>Lingro</Text>
       <Text style={[styles.title, { color: colors.text }]}>Кто вы?</Text>
       <View style={styles.buttons}>
-        <TouchableOpacity
-          style={[styles.card, { backgroundColor: colors.accent }]}
+        <Pressable
+          android_ripple={{ color: '#0002' }}
+          style={({ pressed }) => [
+            styles.card,
+            { backgroundColor: colors.accent },
+            pressed && styles.pressed
+          ]}
           onPress={() => onChoose('teacher')}
         >
-          <Text style={[styles.cardText, { color: '#fff' }]}>Преподаватель</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.card, { backgroundColor: colors.primary }]}
+          <Text style={styles.cardText}>Преподаватель</Text>
+        </Pressable>
+
+        <Pressable
+          android_ripple={{ color: '#0002' }}
+          style={({ pressed }) => [
+            styles.card,
+            { backgroundColor: colors.primary },
+            pressed && styles.pressed
+          ]}
           onPress={() => onChoose('student')}
         >
-          <Text style={[styles.cardText, { color: '#fff' }]}>Ученик</Text>
-        </TouchableOpacity>
+          <Text style={styles.cardText}>Ученик</Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: Spacing.md,
-    justifyContent: 'center'
-  },
+  container: { flex: 1, padding: Spacing.md, justifyContent: 'center' },
   logo: {
     fontSize: FontSizes.xl * 1.5,
     fontWeight: '800',
@@ -82,7 +86,12 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4
   },
+  pressed: {
+    transform: [{ scale: 0.97 }],
+    opacity: 0.8
+  },
   cardText: {
+    color: '#fff',
     fontSize: FontSizes.md,
     fontWeight: '600'
   }

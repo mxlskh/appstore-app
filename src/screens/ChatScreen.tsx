@@ -7,7 +7,9 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  FlatList
+  FlatList,
+  KeyboardAvoidingView,
+  Platform
 } from 'react-native';
 import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
 
@@ -29,48 +31,59 @@ export default function ChatScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <FlatList
-        ref={flatRef}
-        data={messages}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.bubble,
-              item.fromUser ? styles.userBubble : styles.assistantBubble
-            ]}
-          >
-            <Text
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+    >
+      <SafeAreaView style={styles.container}>
+        <FlatList
+          ref={flatRef}
+          data={messages}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View
               style={[
-                styles.bubbleText,
-                { color: item.fromUser ? '#fff' : Colors.text }
+                styles.bubble,
+                item.fromUser ? styles.userBubble : styles.assistantBubble
               ]}
             >
-              {item.text}
-            </Text>
-          </View>
-        )}
-        contentContainerStyle={{ padding: Spacing.md }}
-        onContentSizeChange={() => flatRef.current?.scrollToEnd()}
-      />
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="Напишите сообщение..."
-          placeholderTextColor={Colors.muted}
-          value={input}
-          onChangeText={setInput}
+              <Text
+                style={[
+                  styles.bubbleText,
+                  { color: item.fromUser ? '#fff' : Colors.text }
+                ]}
+              >
+                {item.text}
+              </Text>
+            </View>
+          )}
+          contentContainerStyle={{ padding: Spacing.md }}
+          onContentSizeChange={() => flatRef.current?.scrollToEnd()}
+          keyboardShouldPersistTaps="handled"
         />
-        <TouchableOpacity style={styles.sendButton} onPress={send}>
-          <Text style={styles.sendText}>→</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            placeholder="Напишите сообщение..."
+            placeholderTextColor={Colors.muted}
+            value={input}
+            onChangeText={setInput}
+          />
+          <TouchableOpacity style={styles.sendButton} onPress={send}>
+            <Text style={styles.sendText}>→</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.background

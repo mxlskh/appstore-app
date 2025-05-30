@@ -9,29 +9,32 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
+import { useAppTheme } from '../../App';          // ← импортируем ваш хук
+import { Spacing, BorderRadius, FontSizes } from '../theme';
 
-type RoleSelectionProps = NativeStackScreenProps<RootStackParamList, 'RoleSelection'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'RoleSelection'>;
 
-export default function RoleSelectionScreen({ navigation }: RoleSelectionProps) {
+export default function RoleSelectionScreen({ navigation }: Props) {
+  const { colors } = useAppTheme();              // ← получаем свои цвета
+
   const onChoose = (role: 'student' | 'teacher') =>
     navigation.replace('LanguageSelection', { role });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Кто вы?</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.text }]}>Кто вы?</Text>
       <View style={styles.buttons}>
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: Colors.accent }]}
+          style={[styles.card, { backgroundColor: colors.accent }]}  // ← теперь работает
           onPress={() => onChoose('teacher')}
         >
-          <Text style={styles.cardText}>Преподаватель</Text>
+          <Text style={[styles.cardText, { color: '#fff' }]}>Преподаватель</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.card, { backgroundColor: Colors.primary }]}
+          style={[styles.card, { backgroundColor: colors.primary }]}
           onPress={() => onChoose('student')}
         >
-          <Text style={styles.cardText}>Ученик</Text>
+          <Text style={[styles.cardText, { color: '#fff' }]}>Ученик</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -41,14 +44,12 @@ export default function RoleSelectionScreen({ navigation }: RoleSelectionProps) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     padding: Spacing.md,
     justifyContent: 'center'
   },
   title: {
     fontSize: FontSizes.xl,
     fontWeight: '700',
-    color: Colors.text,
     textAlign: 'center',
     marginBottom: Spacing.lg
   },
@@ -61,14 +62,13 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
-    shadowColor: Colors.text,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4
   },
   cardText: {
-    color: '#fff',
     fontSize: FontSizes.md,
     fontWeight: '600'
   }

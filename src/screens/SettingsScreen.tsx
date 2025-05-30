@@ -1,5 +1,5 @@
 // src/screens/SettingsScreen.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,48 +11,50 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
+import { useAppTheme } from '../../App';                  // ← правильный хук
+import { Spacing, BorderRadius, FontSizes } from '../theme';
 
-type SettingsProps = NativeStackScreenProps<RootStackParamList, 'Settings'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Settings'>;
 
-export default function SettingsScreen({ navigation, route }: SettingsProps) {
+export default function SettingsScreen({ navigation, route }: Props) {
+  const { isDark, toggleTheme, colors } = useAppTheme();  // ← берём colors из контекста
   const { role } = route.params;
-  const [notifications, setNotifications] = useState(false);
-  const [dark, setDark] = useState(false);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.row}>
-          <Text style={styles.label}>Уведомления</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Тёмная тема</Text>
           <Switch
-            value={notifications}
-            onValueChange={setNotifications}
-            trackColor={{ true: Colors.primary }}
+            value={isDark}
+            onValueChange={toggleTheme}
+            trackColor={{ true: colors.primary }}
+            thumbColor={isDark ? colors.accent : undefined}
           />
         </View>
-        <View style={styles.row}>
-          <Text style={styles.label}>Тёмная тема</Text>
-          <Switch
-            value={dark}
-            onValueChange={setDark}
-            trackColor={{ true: Colors.primary }}
-          />
-        </View>
+
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { borderColor: colors.border }]}
           onPress={() => navigation.replace('RoleSelection')}
         >
-          <Text style={styles.buttonText}>Изменить роль</Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>
+            Изменить роль
+          </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
-          style={styles.button}
+          style={[styles.button, { borderColor: colors.border }]}
           onPress={() => navigation.replace('LanguageSelection', { role })}
         >
-          <Text style={styles.buttonText}>Изменить язык</Text>
+          <Text style={[styles.buttonText, { color: colors.text }]}>
+            Изменить язык
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>О разработчиках</Text>
+
+        <TouchableOpacity style={[styles.button, { borderColor: colors.border }]}>
+          <Text style={[styles.buttonText, { color: colors.text }]}>
+            О разработчиках
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -61,8 +63,7 @@ export default function SettingsScreen({ navigation, route }: SettingsProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: Colors.background
+    flex: 1
   },
   content: {
     padding: Spacing.md
@@ -74,19 +75,16 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.sm
   },
   label: {
-    fontSize: FontSizes.md,
-    color: Colors.text
+    fontSize: FontSizes.md
   },
   button: {
-    backgroundColor: Colors.card,
+    backgroundColor: 'transparent',
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
     marginVertical: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.border
+    borderWidth: 1
   },
   buttonText: {
-    fontSize: FontSizes.md,
-    color: Colors.text
+    fontSize: FontSizes.md
   }
 });

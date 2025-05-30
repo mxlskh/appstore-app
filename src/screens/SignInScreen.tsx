@@ -9,40 +9,68 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../../App';
-import { Colors, Spacing, BorderRadius, FontSizes } from '../theme';
+import { useAppTheme } from '../../App';            // ← ваш хук
+import { Spacing, BorderRadius, FontSizes } from '../theme';
 
-type SignInProps = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'SignIn'>;
 
-export default function SignInScreen({ navigation }: SignInProps) {
+export default function SignInScreen({ navigation }: Props) {
+  const { colors } = useAppTheme();                 // ← берём свои цвета
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Добро пожаловать</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.title, { color: colors.primary }]}>
+        Добро пожаловать
+      </Text>
+
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.text
+          }
+        ]}
         placeholder="Email"
-        placeholderTextColor={Colors.muted}
+        placeholderTextColor={colors.muted}
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
+
       <TextInput
-        style={styles.input}
+        style={[
+          styles.input,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+            color: colors.text
+          }
+        ]}
         placeholder="Пароль"
-        placeholderTextColor={Colors.muted}
+        placeholderTextColor={colors.muted}
         secureTextEntry
         value={password}
         onChangeText={setPassword}
       />
+
       <TouchableOpacity
-        style={styles.button}
+        style={[styles.button, { backgroundColor: colors.primary }]}
         onPress={() => navigation.replace('GetStarted')}
       >
-        <Text style={styles.buttonText}>Войти</Text>
+        <Text style={[styles.buttonText, { color: colors.card }]}>
+          Войти
+        </Text>
       </TouchableOpacity>
+
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.link}>Нет аккаунта? Зарегистрируйтесь</Text>
+        <Text style={[styles.link, { color: colors.primary }]}>
+          Нет аккаунта? Зарегистрируйтесь
+        </Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -51,41 +79,33 @@ export default function SignInScreen({ navigation }: SignInProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     padding: Spacing.md,
     justifyContent: 'center'
   },
   title: {
     fontSize: FontSizes.xl,
     fontWeight: '700',
-    color: Colors.primary,
     marginBottom: Spacing.lg,
     alignSelf: 'center'
   },
   input: {
-    backgroundColor: Colors.card,
     borderWidth: 1,
-    borderColor: Colors.border,
     borderRadius: BorderRadius.md,
     padding: Spacing.sm,
     marginBottom: Spacing.md,
-    fontSize: FontSizes.md,
-    color: Colors.text
+    fontSize: FontSizes.md
   },
   button: {
-    backgroundColor: Colors.primary,
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     marginBottom: Spacing.sm
   },
   buttonText: {
-    color: '#fff',
     fontSize: FontSizes.md,
     fontWeight: '600'
   },
   link: {
-    color: Colors.primary,
     fontSize: FontSizes.sm,
     textAlign: 'center'
   }
